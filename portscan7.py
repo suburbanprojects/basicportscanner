@@ -21,6 +21,8 @@ def portscan(target_ip, port_range_start, port_range_end):
                 # Send RST to close connection and avoid half-open connections
                 sr1(IP(dst=target_ip)/TCP(dport=port, flags="R"), timeout=1, verbose=0)
                 print(f"Port {port} is OPEN")
+            elif response.haslayer(TCP) and response.getlayer(TCP).flags == 0x14: #interpret response RST (0x14) → Port is closed.
+                print(f"Port{port} is CLOSED")
         else:
             print(f"Port {port} is FILTERED or no response")
 
