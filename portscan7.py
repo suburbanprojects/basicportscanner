@@ -12,16 +12,18 @@ def portscan(target_ip, port_range_start, port_range_end):
     for port in range(port_range_start, port_range_end + 1):
         #send syn packet
         pkt = IP(dst = target_ip)/TCP(dport=port, flags="S") 
+        #sr1 to send 1 packet
         response = sr1(pkt, timeout=1, verbose=0)
 
         if response:
-            #interpret response SYN-ACK (0x12) → Port is open.
-            if response.haslayer(TCP) and response.getlayer(TCP).flags == 0x12: 
+            #interpret response SYN-ACK  → Port is open.
+            if response.haslayer(TCP) and response.getlayer(TCP).flags == "SA": 
                 open_ports.append(port)
                 # Send RST to close connection and avoid half-open connections
                 sr1(IP(dst=target_ip)/TCP(dport=port, flags="R"), timeout=1, verbose=0)
                 print(f"Port {port} is OPEN")
-            elif response.haslayer(TCP) and response.getlayer(TCP).flags == 0x14: #interpret response RST (0x14) → Port is closed.
+                #interpret response Reset → Port is closed.
+            elif response.haslayer(TCP) and response.getlayer(TCP).flags == "RA": 
                 print(f"Port{port} is CLOSED")
         else:
             print(f"Port {port} is FILTERED or no response")
