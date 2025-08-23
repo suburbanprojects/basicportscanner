@@ -77,3 +77,4 @@ if __name__=='__main__':
     portscanGUI2=portscanGUI()
     sys.exit(app.exec())
     main()
+
